@@ -18,6 +18,7 @@ Paginas principales:
 Tambien debes subir estos archivos y carpetas porque la pagina los usa:
 
 - `assets/`
+- `world-map-locations.png`
 - `support.js`
 - `theme.css`
 - `data.js`
@@ -34,5 +35,6 @@ Notas:
 
 - La pagina principal debe abrir automaticamente como `index.html`.
 - El admin directo sera `tudominio.com/admin.html`.
+- El mapamundi existe en dos rutas para evitar errores de hosting: `assets/world-map-locations.png` y `world-map-locations.png`.
 - Los formularios internos envian respuestas a Google Forms y luego se leen desde las hojas CSV publicadas.
 - Verificar/ocultar centros desde admin funciona en el navegador donde se hace la accion. Para borrar un centro para todos, elimina la fila en Google Sheets.
