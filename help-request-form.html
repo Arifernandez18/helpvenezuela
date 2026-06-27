@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./theme.css">
+<script src="./va-lang.js?v=3"></script>
+<script src="./google-form-config.js"></script>
+<script src="./google-form-submit.js"></script>
+<script src="./va-db.js?v=2"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#f5f8fb; }
+  input, textarea, select { font-family:Inter,sans-serif; }
+  @media (max-width:840px){ .va-formgrid{ grid-template-columns:1fr !important; } }
+</style>
+</helmet>
+
+<div style="font-family:Inter,system-ui,sans-serif; color:#123044; background:#f5f8fb; min-height:100vh;">
+  <dc-import name="Nav" active="request" hint-size="100%,66px"></dc-import>
+
+  <section style="max-width:980px; margin:0 auto; padding:44px 24px 70px;">
+    <div style="margin-bottom:24px;">
+      <a href="request-help.html" style="font-size:13.5px; font-weight:700; color:#0f6b8f; text-decoration:none;">← Volver</a>
+    </div>
+    <div style="background:#fff; border:1px solid #edf2f7; border-radius:22px; overflow:hidden; box-shadow:0 10px 35px rgba(11,42,74,.08);">
+      <div style="padding:34px; background:linear-gradient(135deg,#0b3f5c,#123044); color:#fff;">
+        <div style="display:inline-flex; padding:6px 11px; border-radius:8px; background:rgba(255,255,255,.12); font-size:12px; font-weight:800; margin-bottom:14px;">Pedir ayuda</div>
+        <h1 style="font-family:Archivo,sans-serif; font-size:34px; line-height:1.08; margin:0 0 10px;">Publica una solicitud de ayuda</h1>
+        <p style="max-width:680px; margin:0; color:#c8d6e8; line-height:1.6;">Llena tu informacion una sola vez. La respuesta se guarda en el formulario conectado y aparece automaticamente en familias cuando la hoja publica se actualice.</p>
+      </div>
+
+      <div style="padding:30px 34px 34px;">
+        <div class="va-formgrid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div><label style="{{ label }}">Nombre completo *</label><input data-field="name" style="{{ input }}" /></div>
+          <div><label style="{{ label }}">Correo *</label><input data-field="email" type="email" style="{{ input }}" /></div>
+          <div><label style="{{ label }}">Categoria</label><input data-field="category" style="{{ input }}" placeholder="Medicina, comida, vivienda..." /></div>
+          <div><label style="{{ label }}">Que estas solicitando?</label><select data-field="supportType" style="{{ input }}"><option>Medicina</option><option>Suministros</option><option>Ambos</option></select></div>
+          <div><label style="{{ label }}">Ciudad</label><input data-field="city" style="{{ input }}" /></div>
+          <div><label style="{{ label }}">Estado</label><input data-field="state" style="{{ input }}" /></div>
+        </div>
+
+        <div style="margin-top:16px;"><label style="{{ label }}">Describe tu situacion *</label><textarea data-field="story" rows="5" style="{{ textarea }}" placeholder="Cuenta que paso y que ayuda necesitas"></textarea></div>
+
+        <div class="va-formgrid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;">
+          <div><label style="{{ label }}">Monto solicitado (USD) *</label><input data-field="requested" style="{{ input }}" placeholder="0" /></div>
+          <div><label style="{{ label }}">Metodo de donacion</label><select data-field="method" style="{{ input }}"><option>GoFund Me link</option><option>Zelle</option><option>Pago Movil</option><option>Otro</option></select></div>
+          <div><label style="{{ label }}">Fondos ya recibidos</label><input data-field="raised" style="{{ input }}" placeholder="0" /></div>
+          <div><label style="{{ label }}">Recibo / link</label><input data-field="receipt" style="{{ input }}" placeholder="https://..." /></div>
+        </div>
+
+        <div style="margin-top:16px;"><label style="{{ label }}">Detalles de donacion</label><textarea data-field="details" rows="3" style="{{ textarea }}" placeholder="Zelle, GoFundMe, Pago Movil u otros detalles"></textarea></div>
+        <div style="margin-top:16px;"><label style="{{ label }}">Notas de seguimiento</label><textarea data-field="notes" rows="3" style="{{ textarea }}" placeholder="Que se ha recibido, que falta, y como se usaran los fondos"></textarea></div>
+
+        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:26px;">
+          <button onClick="{{ submit }}" style="padding:14px 22px; background:#0f6b8f; color:#fff; border:none; border-radius:12px; font-family:Inter,sans-serif; font-size:15px; font-weight:800; cursor:pointer;">{{ submitLabel }}</button>
+          <a href="verified-families.html" style="padding:13px 18px; background:#fff; border:1px solid #dfe7ef; color:#123044; border-radius:12px; font-size:14px; font-weight:700; text-decoration:none;">Ver familias</a>
+          <span style="font-size:13px; color:#667789;">{{ status }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <dc-import name="Footer" hint-size="100%,420px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { status: "", busy: false };
+  value(name) {
+    const el = document.querySelector(`[data-field="${name}"]`);
+    return el ? el.value.trim() : "";
+  }
+  clear() {
+    document.querySelectorAll("[data-field]").forEach(el => el.value = "");
+  }
+  renderVals() {
+    return {
+      label: "font-size:13px; font-weight:800; color:#536879; margin-bottom:7px; display:block;",
+      input: "width:100%; height:44px; padding:0 13px; border:1.5px solid #dfe7ef; border-radius:11px; font-size:14px; outline:none; background:#fff;",
+      textarea: "width:100%; padding:12px 13px; border:1.5px solid #dfe7ef; border-radius:11px; font-size:14px; outline:none; resize:vertical; line-height:1.5;",
+      submitLabel: this.state.busy ? "Enviando..." : "Enviar solicitud",
+      status: this.state.status,
+      submit: async () => {
+        if (this.state.busy) return;
+        const values = {
+          name: this.value("name"),
+          email: this.value("email"),
+          category: this.value("category"),
+          supportType: this.value("supportType"),
+          city: this.value("city"),
+          state: this.value("state"),
+          story: this.value("story"),
+          requested: this.value("requested"),
+          method: this.value("method"),
+          details: this.value("details"),
+          raised: this.value("raised"),
+          receipt: this.value("receipt"),
+          notes: this.value("notes")
+        };
+        if (!values.name || !values.email || !values.story || !values.requested) {
+          this.setState({ status: "Completa nombre, correo, historia y monto solicitado." });
+          return;
+        }
+        try {
+          this.setState({ busy: true, status: "Enviando al formulario conectado..." });
+          await window.VA_FORMS.submit("help", values);
+          this.clear();
+          this.setState({ busy: false, status: "Listo. Tu solicitud fue enviada y aparecera cuando se actualice la hoja." });
+        } catch (e) {
+          this.setState({ busy: false, status: "No se pudo enviar. Revisa internet e intenta otra vez." });
+        }
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

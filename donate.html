@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./theme.css">
+<script src="./va-lang.js?v=3"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="data.js"></script>
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#fff; }
+  @media (max-width:900px){ .va-orgs{ grid-template-columns:1fr !important; } .va-amts{ flex-wrap:wrap !important; } }
+</style>
+</helmet>
+
+<div style="font-family:Inter,system-ui,sans-serif; color:#123044; background:#fff; min-height:100vh;">
+  <dc-import name="Nav" active="donate" hint-size="100%,66px"></dc-import>
+
+  <section style="background:#f5f8fb; border-bottom:1px solid #edf2f7;">
+    <div style="max-width:1200px; margin:0 auto; padding:44px 24px 34px; display:flex; flex-wrap:wrap; gap:24px; align-items:flex-end; justify-content:space-between;">
+      <div>
+        <div style="font-family:Archivo,sans-serif; font-weight:700; font-size:13px; letter-spacing:.1em; text-transform:uppercase; color:#c74738; margin-bottom:10px;">Donate</div>
+        <h1 style="font-family:Archivo,sans-serif; font-weight:800; font-size:40px; letter-spacing:-.025em; margin:0 0 12px;">Give through verified organizations</h1>
+        <p style="font-size:17px; color:#536879; margin:0; max-width:560px;">Every organization below is vetted by our team. Track exactly how funds are raised and where aid is delivered.</p>
+      </div>
+      <div style="display:flex; gap:22px;">
+        <div><div style="font-family:Archivo,sans-serif; font-weight:800; font-size:30px; color:#123044;">$1.78M</div><div style="font-size:13px; color:#667789;">Raised across partners</div></div>
+        <div><div style="font-family:Archivo,sans-serif; font-weight:800; font-size:30px; color:#23885f;">100%</div><div style="font-size:13px; color:#667789;">Transparent reporting</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:1200px; margin:0 auto; padding:36px 24px 64px;">
+    <div class="va-orgs" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+      <sc-for list="{{ orgs }}" as="o" hint-placeholder-count="6">
+        <div style="background:#fff; border:1px solid #edf2f7; border-radius:20px; padding:26px; box-shadow:0 1px 3px rgba(11,42,74,.05);">
+          <div style="display:flex; align-items:flex-start; gap:14px; margin-bottom:16px;">
+            <span style="width:54px; height:54px; border-radius:14px; background:{{ o.color }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:Archivo,sans-serif; font-weight:800; font-size:17px; flex-shrink:0;">{{ o.initials }}</span>
+            <div style="flex:1;">
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <h3 style="font-family:Archivo,sans-serif; font-weight:700; font-size:18px; color:#123044; margin:0;">{{ o.name }}</h3>
+                <span style="display:flex; align-items:center; gap:4px; background:#e8f6ef; color:#23885f; font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:999px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="#23885f"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg> Verified</span>
+              </div>
+              <a href="{{ o.website }}" target="_blank" style="font-size:13px; color:#0f6b8f; text-decoration:none;">{{ o.domain }} ↗</a>
+            </div>
+          </div>
+          <p style="font-size:14.5px; line-height:1.6; color:#536879; margin:0 0 20px; min-height:67px;">{{ o.desc }}</p>
+
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;">
+            <span style="font-family:Archivo,sans-serif; font-weight:800; font-size:20px; color:#123044;">{{ o.raisedLabel }}</span>
+            <span style="font-size:13px; color:#667789;">raised of {{ o.goalLabel }}</span>
+          </div>
+          <div style="height:9px; border-radius:6px; background:#edf2f7; overflow:hidden; margin-bottom:7px;"><div style="height:100%; border-radius:6px; background:linear-gradient(90deg,{{ o.color }},{{ o.color2 }}); width:{{ o.pct }};"></div></div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:#667789; margin-bottom:18px;"><span>{{ o.pct }} funded</span><span>{{ o.methodsLabel }}</span></div>
+
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:#667789; margin-bottom:9px;">Donation methods</div>
+          <div style="display:flex; flex-wrap:wrap; gap:7px; margin-bottom:18px;">
+            <sc-for list="{{ o.methods }}" as="m" hint-placeholder-count="3">
+              <span style="display:flex; align-items:center; gap:5px; font-size:12px; font-weight:600; background:{{ m.bg }}; color:{{ m.fg }}; padding:6px 11px; border-radius:9px;">{{ m.label }}</span>
+            </sc-for>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button onClick="{{ o.donate }}" style="flex:1; padding:13px; background:#0f6b8f; color:#fff; border:none; border-radius:11px; font-family:Inter,sans-serif; font-size:14.5px; font-weight:600; cursor:pointer;">Donate</button>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- families nudge -->
+    <div style="margin-top:24px; background:radial-gradient(120% 120% at 0% 0%, #0b3f5c, #123044); color:#fff; border-radius:20px; padding:34px; display:flex; flex-wrap:wrap; gap:20px; align-items:center; justify-content:space-between;">
+      <div>
+        <h3 style="font-family:Archivo,sans-serif; font-weight:800; font-size:24px; margin:0 0 8px;">Prefer to give directly to a family?</h3>
+        <p style="font-size:15.5px; color:#c8d6e8; margin:0; max-width:520px;">Browse verified families and support a specific story — every case is reviewed before publishing.</p>
+      </div>
+      <a href="verified-families.html" style="padding:14px 26px; background:#f2c94c; color:#123044; border-radius:12px; font-size:15px; font-weight:700; text-decoration:none; white-space:nowrap;">View families →</a>
+    </div>
+  </section>
+
+  <!-- donate modal -->
+  <sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ close }}" style="position:fixed; inset:0; z-index:80; background:rgba(11,42,74,.5); backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; padding:20px;">
+      <div onClick="{{ stop }}" style="background:#fff; border-radius:22px; max-width:460px; width:100%; box-shadow:0 40px 90px rgba(0,0,0,.4); overflow:hidden;">
+        <div style="padding:26px 28px; border-bottom:1px solid #edf2f7; display:flex; align-items:center; gap:13px;">
+          <span style="width:46px; height:46px; border-radius:12px; background:{{ active.color }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:Archivo,sans-serif; font-weight:800; font-size:15px;">{{ active.initials }}</span>
+          <div style="flex:1;"><div style="font-family:Archivo,sans-serif; font-weight:700; font-size:17px;">{{ active.name }}</div><div style="font-size:12.5px; color:#667789;">Choose an amount & method</div></div>
+          <button onClick="{{ close }}" style="width:32px; height:32px; border-radius:9px; border:none; background:#f1f4f8; color:#536879; font-size:18px; cursor:pointer;">×</button>
+        </div>
+        <div style="padding:26px 28px;">
+          <div class="va-amts" style="display:flex; gap:9px; margin-bottom:18px;">
+            <sc-for list="{{ amounts }}" as="a" hint-placeholder-count="4">
+              <button onClick="{{ a.pick }}" style="{{ a.style }}">{{ a.label }}</button>
+            </sc-for>
+          </div>
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:#667789; margin-bottom:9px;">Method</div>
+          <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:22px;">
+            <sc-for list="{{ active.methods }}" as="m" hint-placeholder-count="3">
+              <label style="display:flex; align-items:center; gap:11px; padding:13px 15px; border:1.5px solid #dfe7ef; border-radius:12px; cursor:pointer;">
+                <span style="width:18px; height:18px; border-radius:50%; border:2px solid #cdd3da; flex-shrink:0;"></span>
+                <span style="font-size:14px; font-weight:600; color:#123044;">{{ m.label }}</span>
+              </label>
+            </sc-for>
+          </div>
+          <a href="{{ active.website }}" target="_blank" style="display:block; text-align:center; padding:14px; background:#c74738; color:#fff; border-radius:12px; font-size:15px; font-weight:700; text-decoration:none; box-shadow:0 6px 16px rgba(214,40,40,.25);">Continue to {{ active.shortName }}</a>
+          <p style="font-size:12px; color:#667789; text-align:center; margin:14px 0 0; line-height:1.5;">You'll be securely redirected to the organization's official donation page. Venezuela Ayuda never holds your funds.</p>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <dc-import name="Footer" hint-size="100%,420px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { modalId: null, amount: 50 };
+  money(n) { return "$" + n.toLocaleString("en-US"); }
+  methodDef(m) {
+    const map = {
+      website:  { label: "Official site", bg: "#e7f5fa", fg: "#0f6b8f" },
+      gofundme: { label: "GoFundMe", bg: "#e8f6ef", fg: "#23885f" },
+      paypal:   { label: "PayPal", bg: "#eef2ff", fg: "#3d4eaa" },
+      bank:     { label: "Bank transfer", bg: "#f1f4f8", fg: "#4a5568" }
+    };
+    return map[m] || { label: m, bg: "#f1f4f8", fg: "#4a5568" };
+  }
+  renderVals() {
+    const VA = window.VA || { orgs: [] };
+    const orgs = (VA.orgs || []).map(o => ({
+      ...o,
+      domain: o.website.replace(/^https?:\/\//, "").replace(/\/.*$/, ""),
+      raisedLabel: this.money(o.raised),
+      goalLabel: this.money(o.goal),
+      pct: Math.round((o.raised / o.goal) * 100) + "%",
+      color2: "#1E5BB8",
+      methods: o.methods.map(m => this.methodDef(m)),
+      methodsLabel: o.methods.length + " donation methods",
+      donate: () => this.setState({ modalId: o.id })
+    }));
+    const a = (VA.orgs || []).find(o => o.id === this.state.modalId);
+    const active = a ? {
+      ...a,
+      shortName: a.initials,
+      methods: a.methods.map(m => this.methodDef(m))
+    } : {};
+    const amounts = [25, 50, 100, 250].map(v => ({
+      label: "$" + v,
+      pick: () => this.setState({ amount: v }),
+      style: "flex:1; padding:13px 0; border-radius:11px; font-family:Inter,sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:all .15s; " +
+        (this.state.amount === v ? "background:#0f6b8f; color:#fff; border:1.5px solid #0f6b8f;" : "background:#fff; color:#123044; border:1.5px solid #dfe7ef;")
+    }));
+    return {
+      orgs,
+      modalOpen: !!a,
+      active,
+      amounts,
+      close: () => this.setState({ modalId: null }),
+      stop: (e) => e.stopPropagation()
+    };
+  }
+}
+</script>
+</body>
+</html>

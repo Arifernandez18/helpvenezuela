@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./theme.css">
+<script src="./va-lang.js?v=3"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="data.js"></script>
+<script src="./google-form-config.js"></script>
+<script src="./va-centers.js?v=3"></script>
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#fff; }
+  input { font-family:Inter,sans-serif; }
+</style>
+</helmet>
+
+<div style="font-family:Inter,system-ui,sans-serif; color:#123044; background:#fff; min-height:100vh;">
+  <dc-import name="Nav" active="" hint-size="100%,66px"></dc-import>
+
+  <section style="background:radial-gradient(120% 120% at 50% -20%, #0b3f5c, #123044); color:#fff;">
+    <div style="max-width:760px; margin:0 auto; padding:54px 24px 40px; text-align:center;">
+      <h1 style="font-family:Archivo,sans-serif; font-weight:800; font-size:34px; letter-spacing:-.02em; margin:0 0 20px;">Search everything</h1>
+      <div style="position:relative;">
+        <svg style="position:absolute; left:18px; top:50%; transform:translateY(-50%);" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8aa2c0" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+        <input value="{{ query }}" onInput="{{ onInput }}" placeholder="Search cities, organizations, centers, families…" autofocus style="width:100%; height:58px; padding:0 20px 0 50px; border:none; border-radius:15px; font-size:16px; color:#123044; outline:none; box-shadow:0 14px 40px rgba(0,0,0,.25);" />
+      </div>
+      <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:18px;">
+        <sc-for list="{{ scopes }}" as="s" hint-placeholder-count="6"><button onClick="{{ s.pick }}" style="{{ s.style }}">{{ s.label }}</button></sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:860px; margin:0 auto; padding:32px 24px 64px;">
+    <div style="font-size:14px; color:#667789; margin-bottom:20px;"><strong style="color:#123044;">{{ total }}</strong> results for "<span style="color:#123044;">{{ queryShown }}</span>"</div>
+
+    <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="text-align:center; padding:70px 20px; border:1.5px dashed #d8dee6; border-radius:18px; color:#667789;">
+        <div style="width:60px; height:60px; border-radius:16px; background:#f1f4f8; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9aa3ad" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg></div>
+        <div style="font-family:Archivo,sans-serif; font-weight:700; font-size:18px; color:#123044; margin-bottom:6px;">No results found</div>
+        <p style="font-size:14px; margin:0;">Try a different city, organization name, or category.</p>
+      </div>
+    </sc-if>
+
+    <div style="display:flex; flex-direction:column; gap:28px;">
+      <sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
+        <div>
+          <div style="display:flex; align-items:center; gap:9px; margin-bottom:13px;">
+            <span style="{{ g.iconWrap }}">{{ g.iconEl }}</span>
+            <h2 style="font-family:Archivo,sans-serif; font-weight:700; font-size:16px; margin:0;">{{ g.title }}</h2>
+            <span style="font-size:12px; color:#667789; background:#f1f4f8; padding:2px 9px; border-radius:999px;">{{ g.count }}</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="3">
+              <a href="{{ it.href }}" style="display:flex; align-items:center; gap:13px; padding:14px 16px; background:#fff; border:1px solid #edf2f7; border-radius:13px; text-decoration:none; transition:border-color .15s;" style-hover="border-color:#0f6b8f;">
+                <span style="width:38px; height:38px; border-radius:10px; background:{{ it.bg }}; color:{{ it.fg }}; display:flex; align-items:center; justify-content:center; font-family:Archivo,sans-serif; font-weight:700; font-size:13px; flex-shrink:0;">{{ it.tag }}</span>
+                <div style="flex:1; min-width:0;"><div style="font-size:14.5px; font-weight:600; color:#123044;">{{ it.title }}</div><div style="font-size:12.5px; color:#667789;">{{ it.sub }}</div></div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#cdd3da" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+              </a>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <dc-import name="Footer" hint-size="100%,420px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { query: "Miami", scope: "All" };
+  componentDidMount() {
+    this._onCenters = () => this.setState({ centersTick: Date.now() });
+    window.addEventListener("va-centers-change", this._onCenters);
+    if (window.VA_CENTERS && window.VA_CENTERS.refreshCenters) window.VA_CENTERS.refreshCenters();
+  }
+  componentWillUnmount() {
+    if (this._onCenters) window.removeEventListener("va-centers-change", this._onCenters);
+  }
+  renderVals() {
+    const VA = window.VA || { centers: [], orgs: [], families: [] };
+    const q = this.state.query.trim().toLowerCase();
+    const normalize = (value) => String(value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const h = React.createElement;
+    const icon = (paths) => h("svg", { width: 15, height: 15, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" }, paths.map((p, i) => h(p.t || "path", { key: i, ...p })));
+
+    const centerItems = (VA.centers || []).filter(c => {
+      const haystack = [c.name, c.city, c.state, c.country, c.address, c.phone, c.hours, c.notes, ...(c.items || [])].map(normalize).join(" ");
+      return !q || haystack.includes(normalize(q));
+    }).map(c => ({ title: c.name, sub: c.city + ", " + c.state + " · " + c.country, href: "collection-centers.html", tag: "📍", bg: "#e7f5fa", fg: "#0f6b8f", scope: "Collection center" }));
+
+    const orgItems = (VA.orgs || []).filter(o => !q || o.name.toLowerCase().includes(q) || o.desc.toLowerCase().includes(q))
+      .map(o => ({ title: o.name, sub: "Verified organization", href: "donate.html", tag: o.initials, bg: "#e7f5fa", fg: "#557c9b", scope: "Organization" }));
+
+    const famItems = (VA.families || []).filter(f => !q || f.name.toLowerCase().includes(q) || f.location.toLowerCase().includes(q) || f.category.toLowerCase().includes(q))
+      .map(f => ({ title: f.name, sub: f.location + " · " + f.category, href: "verified-families.html", tag: "♥", bg: "#fdecea", fg: "#c74738", scope: "Family" }));
+
+    const volItems = [
+      { title: "Case verifier", sub: "12 openings · remote", href: "volunteers.html", tag: "✓", bg: "#e8f6ef", fg: "#23885f", scope: "Volunteer", key: "verif doctor case" },
+      { title: "Translator (EN/ES)", sub: "8 openings · remote", href: "volunteers.html", tag: "文", bg: "#fff7e6", fg: "#9a5b18", scope: "Volunteer", key: "translat language" }
+    ].filter(v => !q || v.title.toLowerCase().includes(q) || v.key.includes(q));
+
+    const cityNames = [...new Set((VA.centers || []).map(c => c.city))];
+    const cityItems = cityNames.filter(c => !q || c.toLowerCase().includes(q))
+      .map(c => ({ title: c, sub: "View centers in this city", href: "collection-centers.html", tag: "🏙", bg: "#edf2f7", fg: "#4a5568", scope: "City" }));
+
+    const groupDefs = [
+      { scope: "Collection center", title: "Collection centers", items: centerItems, paths: [{ d: "M12 21s-7-5-7-11a7 7 0 0 1 14 0c0 6-7 11-7 11Z" }, { t: "circle", cx: 12, cy: 10, r: 2.5 }], color: "#0f6b8f" },
+      { scope: "Organization", title: "Organizations", items: orgItems, paths: [{ d: "M3 21V7l9-4 9 4v14M9 21v-6h6v6" }], color: "#557c9b" },
+      { scope: "Family", title: "Families", items: famItems, paths: [{ d: "M12 21s-7.5-4.6-7.5-10a4.2 4.2 0 0 1 7.5-2.6A4.2 4.2 0 0 1 19.5 11c0 5.4-7.5 10-7.5 10Z" }], color: "#c74738" },
+      { scope: "Volunteer", title: "Volunteer opportunities", items: volItems, paths: [{ t: "circle", cx: 9, cy: 8, r: 3.5 }, { d: "M2 21c0-3.5 3-6 7-6s7 2.5 7 6" }], color: "#23885f" },
+      { scope: "City", title: "Cities", items: cityItems, paths: [{ d: "M3 21h18M6 21V8l5-3 5 3v13" }], color: "#4a5568" }
+    ];
+
+    const scopeNames = ["All", "City", "Organization", "Collection center", "Family", "Volunteer"];
+    const scopes = scopeNames.map(s => ({
+      label: s === "Collection center" ? "Centers" : s, pick: () => this.setState({ scope: s }),
+      style: "padding:8px 15px; border-radius:999px; font-family:Inter,sans-serif; font-size:13px; font-weight:600; cursor:pointer; transition:all .15s; " +
+        (this.state.scope === s ? "background:#f2c94c; color:#123044; border:1.5px solid #f2c94c;" : "background:rgba(255,255,255,.1); color:#fff; border:1.5px solid rgba(255,255,255,.25);")
+    }));
+
+    const activeGroups = groupDefs
+      .filter(g => this.state.scope === "All" || this.state.scope === g.scope)
+      .filter(g => g.items.length)
+      .map(g => ({
+        title: g.title, count: g.items.length, items: g.items,
+        iconEl: icon(g.paths),
+        iconWrap: `width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center; background:${g.color}1f; color:${g.color};`
+      }));
+    const total = activeGroups.reduce((n, g) => n + g.count, 0);
+
+    return {
+      query: this.state.query,
+      queryShown: this.state.query || "everything",
+      onInput: (e) => this.setState({ query: e.target.value }),
+      scopes, groups: activeGroups, total,
+      isEmpty: total === 0
+    };
+  }
+}
+</script>
+</body>
+</html>

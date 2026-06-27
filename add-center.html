@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./theme.css">
+<script src="./va-lang.js?v=3"></script>
+<script src="./google-form-config.js"></script>
+<script src="./google-form-submit.js"></script>
+<script src="data.js"></script>
+<script src="./va-centers.js?v=3"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#f5f8fb; }
+  input, textarea, select { font-family:Inter,sans-serif; }
+  @media (max-width:840px){ .va-formgrid{ grid-template-columns:1fr !important; } }
+</style>
+</helmet>
+
+<div style="font-family:Inter,system-ui,sans-serif; color:#123044; background:#f5f8fb; min-height:100vh;">
+  <dc-import name="Nav" active="centers" hint-size="100%,66px"></dc-import>
+
+  <section style="max-width:980px; margin:0 auto; padding:44px 24px 70px;">
+    <div style="margin-bottom:24px;">
+      <a href="collection-centers.html" style="font-size:13.5px; font-weight:700; color:#0f6b8f; text-decoration:none;">← Volver a centros</a>
+    </div>
+    <div style="background:#fff; border:1px solid #edf2f7; border-radius:22px; overflow:hidden; box-shadow:0 10px 35px rgba(11,42,74,.08);">
+      <div style="padding:34px; background:linear-gradient(135deg,#0b3f5c,#123044); color:#fff;">
+        <div style="display:inline-flex; padding:6px 11px; border-radius:8px; background:rgba(255,255,255,.12); font-size:12px; font-weight:800; margin-bottom:14px;">Centros de acopio</div>
+        <h1 style="font-family:Archivo,sans-serif; font-size:34px; line-height:1.08; margin:0 0 10px;">Agregar un centro internacional</h1>
+        <p style="max-width:660px; margin:0; color:#c8d6e8; line-height:1.6;">Completa la informacion del punto de acopio. Al enviarlo, se guarda en el formulario conectado y aparece automaticamente en la pagina de centros cuando Google actualice la hoja.</p>
+      </div>
+
+      <div style="padding:30px 34px 34px;">
+        <div class="va-formgrid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div><label style="{{ label }}">Nombre del centro *</label><input data-field="name" style="{{ input }}" placeholder="Ej. HOLA Lakeway" /></div>
+          <div><label style="{{ label }}">Pais *</label><input data-field="country" style="{{ input }}" placeholder="Ej. Estados Unidos" /></div>
+          <div><label style="{{ label }}">Ciudad *</label><input data-field="city" style="{{ input }}" placeholder="Ej. Doral" /></div>
+          <div><label style="{{ label }}">Direccion *</label><input data-field="address" style="{{ input }}" placeholder="Ej. 1850 NW 84th Ave" /></div>
+          <div><label style="{{ label }}">Telefono</label><input data-field="phone" style="{{ input }}" placeholder="WhatsApp o telefono" /></div>
+          <div><label style="{{ label }}">Horario</label><input data-field="hours" style="{{ input }}" placeholder="Ej. Lun-Vie 9am-5pm" /></div>
+        </div>
+
+        <div style="margin-top:18px;">
+          <label style="{{ label }}">Que insumos recibe *</label>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; margin-top:8px;">
+            <sc-for list="{{ supplyOptions }}" as="s" hint-placeholder-count="6">
+              <label style="display:flex; align-items:center; gap:9px; padding:12px; border:1px solid #dfe7ef; border-radius:12px; background:#fafbfd; font-size:13.5px; color:#123044; cursor:pointer;">
+                <input type="checkbox" data-supply value="{{ s }}" style="width:16px; height:16px;"> {{ s }}
+              </label>
+            </sc-for>
+          </div>
+        </div>
+
+        <div class="va-formgrid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:18px;">
+          <div><label style="{{ label }}">Solo recibe algo especifico?</label><input data-field="only" style="{{ input }}" placeholder="Ej. Solo medicinas" /></div>
+          <div><label style="{{ label }}">Website</label><input data-field="website" style="{{ input }}" placeholder="https://..." /></div>
+          <div><label style="{{ label }}">Instagram</label><input data-field="instagram" style="{{ input }}" placeholder="@usuario" /></div>
+          <div><label style="{{ label }}">Notas</label><input data-field="notes" style="{{ input }}" placeholder="Indicaciones o detalles" /></div>
+        </div>
+
+        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:26px;">
+          <button onClick="{{ submit }}" style="padding:14px 22px; background:#0f6b8f; color:#fff; border:none; border-radius:12px; font-family:Inter,sans-serif; font-size:15px; font-weight:800; cursor:pointer;">{{ submitLabel }}</button>
+          <a href="collection-centers.html" style="padding:13px 18px; background:#fff; border:1px solid #dfe7ef; color:#123044; border-radius:12px; font-size:14px; font-weight:700; text-decoration:none;">Ver centros</a>
+          <span style="font-size:13px; color:#667789;">{{ status }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <dc-import name="Footer" hint-size="100%,420px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { status: "", busy: false };
+  value(name) {
+    const el = document.querySelector(`[data-field="${name}"]`);
+    return el ? el.value.trim() : "";
+  }
+  supplies() {
+    return Array.from(document.querySelectorAll("[data-supply]:checked")).map(el => el.value);
+  }
+  clear() {
+    document.querySelectorAll("[data-field]").forEach(el => el.value = "");
+    document.querySelectorAll("[data-supply]").forEach(el => el.checked = false);
+  }
+  renderVals() {
+    return {
+      label: "font-size:13px; font-weight:800; color:#536879; margin-bottom:7px; display:block;",
+      input: "width:100%; height:44px; padding:0 13px; border:1.5px solid #dfe7ef; border-radius:11px; font-size:14px; outline:none;",
+      supplyOptions: ["Medicamentos", "Equipo de rescate (linternas, cascos, herramientas)", "Recursos para mascotas", "Comida enlatada", "Ropa/ Mantas/ Cobijas", "Otros"],
+      submitLabel: this.state.busy ? "Enviando..." : "Enviar centro",
+      status: this.state.status,
+      submit: async () => {
+        if (this.state.busy) return;
+        const values = {
+          name: this.value("name"),
+          country: this.value("country"),
+          city: this.value("city"),
+          address: this.value("address"),
+          phone: this.value("phone"),
+          hours: this.value("hours"),
+          supplies: this.supplies(),
+          only: this.value("only"),
+          notes: this.value("notes"),
+          website: this.value("website"),
+          instagram: this.value("instagram")
+        };
+        if (!values.name || !values.country || !values.city || !values.address || !values.supplies.length) {
+          this.setState({ status: "Completa nombre, pais, ciudad, direccion e insumos." });
+          return;
+        }
+        try {
+          this.setState({ busy: true, status: "Enviando al formulario conectado..." });
+          await window.VA_FORMS.submit("center", values);
+          this.clear();
+          this.setState({ busy: false, status: "Listo. El centro fue enviado y debe aparecer al actualizar la lista." });
+        } catch (e) {
+          this.setState({ busy: false, status: "No se pudo enviar. Revisa internet e intenta otra vez." });
+        }
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

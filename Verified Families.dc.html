@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./theme.css">
+<script src="./va-lang.js?v=3"></script>
+<script src="./google-form-config.js"></script>
+<script src="./supabase-config.js"></script>
+<script src="./va-db.js?v=2"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="data.js"></script>
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#fff; }
+  @media (max-width:980px){ .va-fam{ grid-template-columns:1fr 1fr !important; } }
+  @media (max-width:640px){ .va-fam{ grid-template-columns:1fr !important; } }
+</style>
+</helmet>
+
+<div style="font-family:Inter,system-ui,sans-serif; color:#123044; background:#fff; min-height:100vh;">
+  <dc-import name="Nav" active="families" hint-size="100%,66px"></dc-import>
+
+  <section style="background:#f5f8fb; border-bottom:1px solid #edf2f7;">
+    <div style="max-width:1200px; margin:0 auto; padding:44px 24px 34px;">
+      <div style="font-family:Archivo,sans-serif; font-weight:700; font-size:13px; letter-spacing:.1em; text-transform:uppercase; color:#23885f; margin-bottom:10px;">Verified Families</div>
+      <h1 style="font-family:Archivo,sans-serif; font-weight:800; font-size:40px; letter-spacing:-.025em; margin:0 0 12px;">Real stories, reviewed and verified</h1>
+      <p style="font-size:17px; color:#536879; margin:0; max-width:600px;">Every family here has been verified by our team. Choose a story to support directly — your gift goes where it's needed most.</p>
+    </div>
+  </section>
+
+  <section style="max-width:1200px; margin:0 auto; padding:28px 24px 16px; display:flex; flex-wrap:wrap; gap:8px;">
+    <sc-for list="{{ cats }}" as="c" hint-placeholder-count="0">
+      <button onClick="{{ c.pick }}" style="{{ c.style }}">{{ c.label }}</button>
+    </sc-for>
+  </section>
+
+  <sc-if value="{{ noFamilies }}" hint-placeholder-val="{{ false }}">
+    <section style="max-width:760px; margin:0 auto; padding:36px 24px 90px; text-align:center;">
+      <div style="width:72px; height:72px; border-radius:20px; background:#e8f6ef; display:flex; align-items:center; justify-content:center; margin:0 auto 20px;"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#23885f" stroke-width="2"><path d="M12 21s-7.5-4.6-7.5-10a4.2 4.2 0 0 1 7.5-2.6A4.2 4.2 0 0 1 19.5 11c0 5.4-7.5 10-7.5 10Z"/></svg></div>
+      <h2 style="font-family:Archivo,sans-serif; font-weight:800; font-size:26px; letter-spacing:-.02em; color:#123044; margin:0 0 12px;">No families published yet</h2>
+      <p style="font-size:16px; line-height:1.6; color:#536879; margin:0 auto 26px; max-width:480px;">We're not showing any family stories yet. Once someone publishes a request, it will appear here with its story, donation link and progress.</p>
+      <div style="display:flex; gap:11px; justify-content:center; flex-wrap:wrap;">
+        <a href="request-help.html" style="padding:13px 24px; background:#0f6b8f; color:#fff; border-radius:12px; font-size:14.5px; font-weight:600; text-decoration:none;">Submit a request</a>
+        <a href="donate.html" style="padding:13px 24px; background:#fff; border:1px solid #dfe7ef; color:#123044; border-radius:12px; font-size:14.5px; font-weight:600; text-decoration:none;">Donate to an organization</a>
+      </div>
+    </section>
+  </sc-if>
+
+  <section style="max-width:1200px; margin:0 auto; padding:12px 24px 64px;">
+    <div class="va-fam" style="display:grid; grid-template-columns:repeat(3,1fr); gap:20px;">
+      <sc-for list="{{ families }}" as="f" hint-placeholder-count="6">
+        <div style="background:#fff; border:1px solid #edf2f7; border-radius:20px; overflow:hidden; box-shadow:0 1px 3px rgba(11,42,74,.05); display:flex; flex-direction:column;">
+          <div style="position:relative; height:170px; background:linear-gradient(135deg,{{ f.c1 }},{{ f.c2 }}); display:flex; align-items:center; justify-content:center;">
+            <svg width="52" height="52" viewBox="0 0 24 24" fill="rgba(255,255,255,.55)"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-4 0-8 2-8 5v1h16v-1c0-3-4-5-8-5Z"/></svg>
+            <span style="position:absolute; top:13px; left:13px; font-size:11px; font-weight:600; background:rgba(255,255,255,.92); color:#123044; padding:4px 10px; border-radius:999px;">{{ f.category }}</span>
+            <span style="position:absolute; top:13px; right:13px; display:flex; align-items:center; gap:4px; background:rgba(255,255,255,.95); color:#23885f; font-size:11px; font-weight:700; padding:4px 9px; border-radius:999px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="#23885f"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg> Verified</span>
+          </div>
+          <div style="padding:20px; display:flex; flex-direction:column; flex:1;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:5px;">
+              <h3 style="font-family:Archivo,sans-serif; font-weight:700; font-size:17px; color:#123044; margin:0;">{{ f.name }}</h3>
+            </div>
+            <div style="display:flex; align-items:center; gap:5px; font-size:12.5px; color:#667789; margin-bottom:12px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9aa3ad" stroke-width="2"><path d="M12 21s-7-5-7-11a7 7 0 0 1 14 0c0 6-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg> {{ f.location }}
+            </div>
+            <p style="font-size:13.5px; line-height:1.55; color:#536879; margin:0 0 16px; flex:1;">{{ f.story }}</p>
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px;">
+              <span style="font-family:Archivo,sans-serif; font-weight:800; font-size:17px; color:#123044;">{{ f.raisedLabel }}</span>
+              <span style="font-size:12.5px; color:#667789;">of {{ f.goalLabel }}</span>
+            </div>
+            <div style="height:8px; border-radius:6px; background:#edf2f7; overflow:hidden; margin-bottom:7px;"><div style="height:100%; border-radius:6px; background:#23885f; width:{{ f.pct }};"></div></div>
+            <div style="display:flex; justify-content:space-between; font-size:12px; color:#667789; margin-bottom:14px;"><span>{{ f.pct }} funded</span><span style="display:flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#667789" stroke-width="2"><path d="M12 8v8M8 12h8"/><circle cx="12" cy="12" r="9"/></svg> {{ f.updates }} updates</span></div>
+            <div style="display:flex; gap:8px;">
+              <button onClick="{{ f.open }}" style="flex:1; padding:11px; background:#0f6b8f; color:#fff; border:none; border-radius:10px; font-family:Inter,sans-serif; font-size:13.5px; font-weight:600; cursor:pointer;">Donate</button>
+              <button onClick="{{ f.share }}" aria-label="Share" style="width:42px; padding:11px 0; background:#fff; border:1px solid #dfe7ef; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#536879" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg></button>
+              <button onClick="{{ f.report }}" aria-label="Report" style="width:42px; padding:11px 0; background:#fff; border:1px solid #dfe7ef; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9aa3ad" stroke-width="2"><path d="M4 22V4h12l-2 4 2 4H4"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- family detail modal -->
+  <sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ close }}" style="position:fixed; inset:0; z-index:80; background:rgba(11,42,74,.5); backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; padding:20px;">
+      <div onClick="{{ stop }}" style="background:#fff; border-radius:22px; max-width:560px; width:100%; max-height:90vh; overflow:auto; box-shadow:0 40px 90px rgba(0,0,0,.4);">
+        <div style="position:relative; height:180px; background:linear-gradient(135deg,{{ active.c1 }},{{ active.c2 }}); display:flex; align-items:center; justify-content:center;">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="rgba(255,255,255,.6)"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-4 0-8 2-8 5v1h16v-1c0-3-4-5-8-5Z"/></svg>
+          <button onClick="{{ close }}" style="position:absolute; top:14px; right:14px; width:34px; height:34px; border-radius:10px; border:none; background:rgba(255,255,255,.25); color:#fff; font-size:18px; cursor:pointer;">×</button>
+          <span style="position:absolute; bottom:14px; left:20px; display:flex; align-items:center; gap:4px; background:rgba(255,255,255,.95); color:#23885f; font-size:11px; font-weight:700; padding:4px 10px; border-radius:999px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="#23885f"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg> Verified by our team</span>
+        </div>
+        <div style="padding:26px 28px;">
+          <h2 style="font-family:Archivo,sans-serif; font-weight:800; font-size:23px; margin:0 0 4px;">{{ active.name }}</h2>
+          <div style="font-size:13.5px; color:#667789; margin-bottom:18px;">{{ active.location }} · {{ active.category }}</div>
+          <p style="font-size:15px; line-height:1.65; color:#3a4452; margin:0 0 22px;">{{ active.story }}</p>
+          <div style="background:#f5f8fb; border-radius:14px; padding:18px; margin-bottom:22px;">
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:9px;">
+              <span style="font-family:Archivo,sans-serif; font-weight:800; font-size:24px; color:#123044;">{{ active.raisedLabel }}</span>
+              <span style="font-size:13.5px; color:#667789;">raised of {{ active.goalLabel }}</span>
+            </div>
+            <div style="height:10px; border-radius:7px; background:#e7ecf2; overflow:hidden;"><div style="height:100%; border-radius:7px; background:#23885f; width:{{ active.pct }};"></div></div>
+          </div>
+          <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:#667789; margin-bottom:12px;">Recent updates</div>
+          <div style="display:flex; flex-direction:column; gap:14px; margin-bottom:24px;">
+            <sc-for list="{{ active.updateList }}" as="u" hint-placeholder-count="2">
+              <div style="display:flex; gap:12px;">
+                <span style="width:9px; height:9px; border-radius:50%; background:#23885f; margin-top:5px; flex-shrink:0;"></span>
+                <div><div style="font-size:13.5px; color:#123044; line-height:1.5;">{{ u.text }}</div><div style="font-size:12px; color:#8b9aaa; margin-top:2px;">{{ u.date }}</div></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button style="flex:1; padding:14px; background:#c74738; color:#fff; border:none; border-radius:12px; font-family:Inter,sans-serif; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 6px 16px rgba(214,40,40,.22);">Donate to this family</button>
+            <button onClick="{{ activeShare }}" style="padding:14px 18px; background:#fff; border:1px solid #dfe7ef; color:#123044; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer;">Share</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- share toast -->
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:90; background:#123044; color:#fff; padding:13px 20px; border-radius:12px; font-size:14px; font-weight:500; box-shadow:0 12px 30px rgba(0,0,0,.3); display:flex; align-items:center; gap:9px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#3ad37f"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg> {{ toast }}
+    </div>
+  </sc-if>
+
+  <dc-import name="Footer" hint-size="100%,420px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { cat: "All", modalId: null, toast: "" };
+  componentDidMount() {
+    this._onDb = () => this.setState({ dbTick: Date.now() });
+    window.addEventListener("va-db-change", this._onDb);
+    if (window.VADB && window.VADB.refreshRemote) window.VADB.refreshRemote();
+  }
+  componentWillUnmount() {
+    if (this._onDb) window.removeEventListener("va-db-change", this._onDb);
+  }
+  money(n) { return "$" + n.toLocaleString("en-US"); }
+  flash(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ toast: "" }), 2200);
+  }
+  decorate(f, i) {
+    return {
+      ...f,
+      pct: Math.round((f.raised / f.requested) * 100) + "%",
+      raisedLabel: this.money(f.raised),
+      goalLabel: this.money(f.requested),
+      c1: ["#0f6b8f", "#23885f", "#c74738", "#557c9b", "#E0A411", "#0e7490"][i % 6],
+      c2: ["#0b3f5c", "#0e6b3d", "#9a1f1f", "#4a2680", "#b7791f", "#0a4d5e"][i % 6]
+    };
+  }
+  renderVals() {
+    const seed = (window.VA && window.VA.families) || [];
+    const approved = window.VADB ? window.VADB.publicFamilies() : [];
+    const all = [...approved, ...seed];
+    const catList = all.length ? ["All", ...new Set(all.map(f => f.category))] : [];
+    const cats = catList.map(c => ({
+      label: c, pick: () => this.setState({ cat: c }),
+      style: "height:36px; padding:0 16px; border-radius:999px; font-family:Inter,sans-serif; font-size:13.5px; font-weight:600; cursor:pointer; transition:all .15s; " +
+        (this.state.cat === c ? "background:#0f6b8f; color:#fff; border:1.5px solid #0f6b8f;" : "background:#fff; color:#536879; border:1.5px solid #dfe7ef;")
+    }));
+    const families = all
+      .map((f, i) => this.decorate(f, i))
+      .filter(f => this.state.cat === "All" || f.category === this.state.cat)
+      .map(f => ({
+        ...f,
+        open: () => this.setState({ modalId: f.id }),
+        share: () => this.flash("Link copied — thank you for sharing " + f.name + "!"),
+        report: () => this.flash("Report submitted. Our team will review this case.")
+      }));
+    const a0 = all.findIndex(f => f.id === this.state.modalId);
+    const a = a0 >= 0 ? this.decorate(all[a0], a0) : null;
+    const active = a ? {
+      ...a,
+      updateList: [
+        { text: "Thank you — we reached the first milestone and started the most urgent work.", date: "3 days ago" },
+        { text: "Our team confirmed the documents and published this verified request.", date: "1 week ago" }
+      ]
+    } : {};
+    return {
+      cats, families,
+      noFamilies: all.length === 0,
+      modalOpen: !!a, active,
+      activeShare: () => this.flash("Link copied — thank you for sharing!"),
+      close: () => this.setState({ modalId: null }),
+      stop: (e) => e.stopPropagation(),
+      toast: this.state.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

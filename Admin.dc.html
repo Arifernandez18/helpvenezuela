@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./theme.css">
+<script src="./va-lang.js?v=3"></script>
+<script src="./google-form-config.js"></script>
+<script src="./supabase-config.js"></script>
+<script src="./va-db.js?v=2"></script>
+<script src="data.js"></script>
+<script src="./va-centers.js?v=3"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#0a1929; }
+  @media (max-width:1000px){ .va-adminlayout{ grid-template-columns:1fr !important; } .va-asidenav{ display:none !important; } .va-kpis{ grid-template-columns:1fr 1fr !important; } }
+</style>
+</helmet>
+
+<div style="font-family:Inter,system-ui,sans-serif; color:#e8eef6; background:#0a1929; min-height:100vh;">
+  <div class="va-adminlayout" style="display:grid; grid-template-columns:248px 1fr; min-height:100vh;">
+    <!-- sidebar -->
+    <aside class="va-asidenav" style="background:#0e2138; border-right:1px solid #1b3454; padding:22px 16px; display:flex; flex-direction:column;">
+      <div style="display:flex; align-items:center; gap:10px; padding:0 8px 22px;">
+        <span style="width:34px; height:34px; border-radius:9px; background:#0f6b8f; display:flex; align-items:center; justify-content:center;"><svg width="17" height="17" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-7.5-10a4.2 4.2 0 0 1 7.5-2.6A4.2 4.2 0 0 1 19.5 11c0 5.4-7.5 10-7.5 10Z" fill="#fff"/></svg></span>
+        <div><div style="font-family:Archivo,sans-serif; font-weight:800; font-size:14.5px; color:#fff;">Admin Console</div><div style="font-size:11px; color:#6b88ab;">Venezuela Ayuda</div></div>
+      </div>
+      <nav style="display:flex; flex-direction:column; gap:3px;">
+        <sc-for list="{{ menu }}" as="m" hint-placeholder-count="6"><div onClick="{{ m.pick }}" style="{{ m.style }}"><span style="{{ m.iconWrap }}">{{ m.iconEl }}</span>{{ m.label }}<sc-if value="{{ m.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="margin-left:auto; background:#c74738; color:#fff; font-size:11px; font-weight:700; padding:1px 7px; border-radius:999px;">{{ m.badge }}</span></sc-if></div></sc-for>
+      </nav>
+      <div style="margin-top:auto; padding:14px; background:#0a1c30; border:1px solid #1b3454; border-radius:13px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="width:36px; height:36px; border-radius:10px; background:#1f3e63; color:#cfe0f2; display:flex; align-items:center; justify-content:center; font-family:Archivo,sans-serif; font-weight:700; font-size:13px;">JC</span>
+          <div style="flex:1; min-width:0;"><div style="font-size:13px; font-weight:600; color:#e8eef6;">J. Castillo</div><div style="font-size:11px; color:#6b88ab;">Administrator</div></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- main -->
+    <main style="padding:26px 30px 60px; overflow:auto;">
+      <div style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between; margin-bottom:24px;">
+        <div>
+          <h1 style="font-family:Archivo,sans-serif; font-weight:800; font-size:26px; color:#fff; margin:0 0 4px;">Moderation overview</h1>
+          <p style="font-size:13.5px; color:#7f9cbf; margin:0;">Edit public submissions after users publish them.</p>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <sc-if value="{{ adminLoggedOut }}" hint-placeholder-val="{{ false }}">
+            <input data-admin-password type="password" placeholder="Admin password" style="height:40px; width:160px; padding:0 12px; border:1px solid #1b3454; background:#0e2138; color:#e8eef6; border-radius:10px; font-family:Inter,sans-serif; font-size:13px; outline:none;" />
+            <button onClick="{{ adminLogin }}" style="padding:10px 16px; background:#23885f; border:none; color:#fff; border-radius:10px; font-family:Inter,sans-serif; font-size:13.5px; font-weight:600; cursor:pointer;">Log in</button>
+          </sc-if>
+          <sc-if value="{{ adminLoggedIn }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ adminLogout }}" style="padding:10px 16px; background:#0e2138; border:1px solid #1b3454; color:#cfe0f2; border-radius:10px; font-family:Inter,sans-serif; font-size:13.5px; font-weight:600; cursor:pointer;">Sign out</button>
+          </sc-if>
+          <button onClick="{{ exportCsv }}" style="display:flex; align-items:center; gap:7px; padding:10px 16px; background:#0e2138; border:1px solid #1b3454; color:#cfe0f2; border-radius:10px; font-family:Inter,sans-serif; font-size:13.5px; font-weight:600; cursor:pointer;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg> Export CSV</button>
+          <a href="index.html" style="padding:10px 16px; background:#0f6b8f; color:#fff; border-radius:10px; font-size:13.5px; font-weight:600; text-decoration:none; display:flex; align-items:center;">View public site</a>
+        </div>
+      </div>
+
+      <sc-if value="{{ adminLoggedOut }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#0e2138; border:1px solid #2a4568; border-radius:18px; padding:20px; margin-bottom:24px; display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between;">
+          <div>
+            <h2 style="font-family:Archivo,sans-serif; font-weight:800; font-size:19px; color:#fff; margin:0 0 4px;">Admin login</h2>
+            <p style="font-size:13.5px; color:#9fb6d4; margin:0;">Enter the admin password to edit public submissions.</p>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <input data-admin-password-main type="password" placeholder="Admin password" style="height:44px; width:210px; padding:0 13px; border:1px solid #2a4568; background:#0a1c30; color:#e8eef6; border-radius:11px; font-family:Inter,sans-serif; font-size:14px; outline:none;" />
+            <button onClick="{{ adminLoginMain }}" style="height:44px; padding:0 20px; background:#23885f; border:none; color:#fff; border-radius:11px; font-family:Inter,sans-serif; font-size:14px; font-weight:700; cursor:pointer;">Log in</button>
+            <span style="font-size:12.5px; color:#7f9cbf;">Demo password: <strong style="color:#cfe0f2;">admin123</strong></span>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- KPIs -->
+      <div class="va-kpis" style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px;">
+        <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+          <div style="background:#0e2138; border:1px solid #1b3454; border-radius:16px; padding:18px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div style="font-size:12.5px; color:#7f9cbf;">{{ k.label }}</div>
+              <span style="{{ k.deltaStyle }}">{{ k.delta }}</span>
+            </div>
+            <div style="font-family:Archivo,sans-serif; font-weight:800; font-size:28px; color:#fff; margin-top:8px;">{{ k.value }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1.7fr 1fr; gap:20px; align-items:start;">
+        <!-- approval queue -->
+        <div style="background:#0e2138; border:1px solid #1b3454; border-radius:18px; overflow:hidden;">
+          <div style="padding:18px 22px; border-bottom:1px solid #1b3454; display:flex; align-items:center; justify-content:space-between;">
+            <h2 style="font-family:Archivo,sans-serif; font-weight:700; font-size:16px; color:#fff; margin:0;">Published submissions</h2>
+            <div style="display:flex; gap:6px;">
+              <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.pick }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
+            </div>
+          </div>
+          <div style="padding:8px 10px;">
+            <sc-for list="{{ rows }}" as="r" hint-placeholder-count="5">
+              <div style="display:flex; align-items:center; gap:14px; padding:14px 12px; border-radius:12px; transition:background .15s;" style-hover="background:#0a1c30;">
+                <span style="width:40px; height:40px; border-radius:11px; background:{{ r.avatarBg }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:Archivo,sans-serif; font-weight:700; font-size:13px; flex-shrink:0;">{{ r.initials }}</span>
+                <div style="flex:1; min-width:0;">
+                  <div style="display:flex; align-items:center; gap:8px;"><span style="font-size:14px; font-weight:600; color:#e8eef6;">{{ r.name }}</span><span style="{{ r.typeChip }}">{{ r.type }}</span><sc-if value="{{ r.flagged }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px; font-weight:700; color:#ffb4a8; background:#3a1714; padding:2px 8px; border-radius:999px; display:flex; align-items:center; gap:3px;">⚑ Flagged</span></sc-if></div>
+                  <div style="font-size:12px; color:#7f9cbf; margin-top:2px;">{{ r.meta }}</div>
+                </div>
+                <div style="display:flex; gap:7px; flex-shrink:0;">
+                  <sc-if value="{{ r.canVerify }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.verify }}" style="height:34px; padding:0 11px; border-radius:9px; border:1px solid #1f6f50; background:#10331f; color:#7df0b5; cursor:pointer; font-family:Inter,sans-serif; font-size:12px; font-weight:700;">Verify</button></sc-if>
+                  <sc-if value="{{ r.canDelete }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.delete }}" style="height:34px; padding:0 11px; border-radius:9px; border:1px solid #6c2a24; background:#3a1714; color:#ffb4a8; cursor:pointer; font-family:Inter,sans-serif; font-size:12px; font-weight:700;">Hide</button></sc-if>
+                  <sc-if value="{{ r.canEdit }}" hint-placeholder-val="{{ true }}"><button onClick="{{ r.edit }}" style="width:34px; height:34px; border-radius:9px; border:1px solid #1b3454; background:transparent; color:#cfe0f2; cursor:pointer; display:flex; align-items:center; justify-content:center;" title="Edit submitted info"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></sc-if>
+                </div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ allClear }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:center; padding:46px 20px; color:#7f9cbf;">
+                <div style="width:54px; height:54px; border-radius:15px; background:#10331f; display:flex; align-items:center; justify-content:center; margin:0 auto 14px;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3ad37f" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg></div>
+                <div style="font-family:Archivo,sans-serif; font-weight:700; font-size:16px; color:#e8eef6;">No submissions yet</div>
+                <p style="font-size:13px; margin:6px 0 0;">Published user submissions will appear here.</p>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+
+        <!-- analytics -->
+        <div style="display:flex; flex-direction:column; gap:20px;">
+          <div style="background:#0e2138; border:1px solid #1b3454; border-radius:18px; padding:20px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;"><h2 style="font-family:Archivo,sans-serif; font-weight:700; font-size:15.5px; color:#fff; margin:0;">Submissions / week</h2><span style="font-size:12px; color:#3ad37f; font-weight:600;">↑ 18%</span></div>
+            <div style="display:flex; align-items:flex-end; gap:8px; height:120px;">
+              <sc-for list="{{ bars }}" as="b" hint-placeholder-count="7">
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:7px;">
+                  <div style="width:100%; border-radius:6px 6px 0 0; background:linear-gradient(#2f7bd6,#0f6b8f); height:{{ b.h }};"></div>
+                  <span style="font-size:10.5px; color:#6b88ab;">{{ b.label }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#0e2138; border:1px solid #1b3454; border-radius:18px; padding:20px;">
+            <h2 style="font-family:Archivo,sans-serif; font-weight:700; font-size:15.5px; color:#fff; margin:0 0 16px;">Public records</h2>
+            <div style="display:flex; flex-direction:column; gap:13px;">
+              <sc-for list="{{ statusBars }}" as="s" hint-placeholder-count="4">
+                <div>
+                  <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:6px;"><span style="color:#cfe0f2;">{{ s.label }}</span><span style="color:#7f9cbf;">{{ s.count }}</span></div>
+                  <div style="height:7px; border-radius:5px; background:#0a1c30; overflow:hidden;"><div style="height:100%; border-radius:5px; background:{{ s.color }}; width:{{ s.pct }};"></div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#0e2138; border:1px solid #1b3454; border-radius:18px; padding:20px;">
+            <h2 style="font-family:Archivo,sans-serif; font-weight:700; font-size:15.5px; color:#fff; margin:0 0 6px;">Edit submitted info</h2>
+            <p style="font-size:12.5px; color:#7f9cbf; margin:0 0 14px; line-height:1.5;">Select a submission from the queue. Admins can correct or verify uploaded information, not create standalone tracking records.</p>
+            <sc-if value="{{ noEditSelected }}" hint-placeholder-val="{{ true }}">
+              <div style="border:1px dashed #2a4568; border-radius:12px; padding:18px; text-align:center; color:#7f9cbf; font-size:13px;">Choose the pencil button on a request to edit it.</div>
+            </sc-if>
+            <sc-if value="{{ editSelected }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                <input data-edit-field="name" value="{{ edit.name }}" placeholder="Full name" style="height:40px; padding:0 12px; border:1px solid #1b3454; background:#0a1c30; color:#e8eef6; border-radius:10px; font-family:Inter,sans-serif; font-size:13px; outline:none;" />
+                <input data-edit-field="category" value="{{ edit.category }}" placeholder="Category" style="height:40px; padding:0 12px; border:1px solid #1b3454; background:#0a1c30; color:#e8eef6; border-radius:10px; font-family:Inter,sans-serif; font-size:13px; outline:none;" />
+                <select data-edit-field="supportType" value="{{ edit.supportType }}" style="height:40px; padding:0 12px; border:1px solid #1b3454; background:#0a1c30; color:#e8eef6; border-radius:10px; font-family:Inter,sans-serif; font-size:13px; outline:none;"><option value="money">Money / direct financial help</option><option value="supplies">Supplies only</option><option value="both">Money and supplies</option></select>
+                <input data-edit-field="city" value="{{ edit.city }}" placeholder="City" style="height:40px; padding:0 12px; border:1px solid #1b3454; background:#0a1c30; color:#e8eef6; border-radius:10px; font-family:Inter,sans-serif; font-size:13px; outline:none;" />
+                <input data-edit-field="state" value="{{ edit.state }}" placeholder="State" style="height:40px; padding:0 12px; border:1px solid #1b3454; background:#0a1c30; color:#e8eef6; border-radius:10px; font-family:Inter,sans-serif; font-size:13px; outline:none;" />
+                <textarea data-edit-field="story" rows="4" placeholder="Story" style="padding:10px 12px; border:1px solid #1b3454; background:#0a1c30; color:#e8eef6; border-radius:10px; font-family:Inter,sans-serif; font-size:13px; outline:none; resize:vertical;">{{ edit.story }}</textarea>
+                <input data-edit-field="requested" value="{{ edit.requested }}" placeholder="Requested amount" style="height:40px; padding:0 12px; border:1px solid #1b3454; background:#0a1c30; color:#e8eef6; border-radius:10px; font-family:Inter,sans-serif; font-size:13px; outline:none;" />
+                <input data-edit-field="raised" value="{{ edit.raised }}" placeholder="Funds received" style="height:40px; padding:0 12px; border:1px solid #1b3454; background:#0a1c30; color:#e8eef6; border-radius:10px; font-family:Inter,sans-serif; font-size:13px; outline:none;" />
+                <input data-edit-field="details" value="{{ edit.details }}" placeholder="Donation details" style="height:40px; padding:0 12px; border:1px solid #1b3454; background:#0a1c30; color:#e8eef6; border-radius:10px; font-family:Inter,sans-serif; font-size:13px; outline:none;" />
+                <input data-edit-field="receipt" value="{{ edit.receipt }}" placeholder="Receipt / proof link" style="height:40px; padding:0 12px; border:1px solid #1b3454; background:#0a1c30; color:#e8eef6; border-radius:10px; font-family:Inter,sans-serif; font-size:13px; outline:none;" />
+                <textarea data-edit-field="trackingNotes" rows="3" placeholder="Tracking notes" style="padding:10px 12px; border:1px solid #1b3454; background:#0a1c30; color:#e8eef6; border-radius:10px; font-family:Inter,sans-serif; font-size:13px; outline:none; resize:vertical;">{{ edit.trackingNotes }}</textarea>
+                <button onClick="{{ saveEdit }}" style="padding:12px 14px; background:#0f6b8f; color:#fff; border:none; border-radius:10px; font-family:Inter,sans-serif; font-size:13.5px; font-weight:700; cursor:pointer;">Save changes</button>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; bottom:24px; right:24px; z-index:90; background:#0e2138; border:1px solid #1b3454; color:#e8eef6; padding:13px 18px; border-radius:12px; font-size:13.5px; font-weight:500; box-shadow:0 14px 34px rgba(0,0,0,.5); display:flex; align-items:center; gap:9px;">
+      <span style="{{ toastDot }}"></span> {{ toast }}
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { section: "approvals", tab: "Requests", toast: "", toastDot: "", acted: {}, editId: null, authed: !!(window.VADB && window.VADB.adminSession()) };
+  componentDidMount() {
+    this._onDb = () => this.setState({ dbTick: Date.now() });
+    this._onCenters = () => this.setState({ centersTick: Date.now() });
+    window.addEventListener("va-db-change", this._onDb);
+    window.addEventListener("va-centers-change", this._onCenters);
+    if (window.VADB && window.VADB.refreshRemote) window.VADB.refreshRemote();
+    if (window.VA_CENTERS && window.VA_CENTERS.refreshCenters) window.VA_CENTERS.refreshCenters();
+  }
+  componentWillUnmount() {
+    if (this._onDb) window.removeEventListener("va-db-change", this._onDb);
+    if (this._onCenters) window.removeEventListener("va-centers-change", this._onCenters);
+  }
+  flash(msg, color) {
+    this.setState({ toast: msg, toastDot: `width:9px;height:9px;border-radius:50%;background:${color};` });
+    clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: "" }), 2200);
+  }
+  act(id, status, label, color) {
+    if (!this.state.authed) { this.flash("Log in as admin first. Password: admin123", "#ffb86b"); return; }
+    window.VADB.updateRequest(id, { status, reviewedAt: new Date().toISOString() });
+    this.flash(label, color);
+    this.setState({});
+  }
+  editData() {
+    const data = {};
+    document.querySelectorAll("[data-edit-field]").forEach((el) => data[el.getAttribute("data-edit-field")] = el.value);
+    return data;
+  }
+  supportLabel(value) {
+    return { money: "Money", supplies: "Supplies", both: "Money + supplies" }[value || "money"] || "Money";
+  }
+  renderVals() {
+    const VADB = window.VADB;
+    const db = VADB.load();
+    const publishedRequests = db.requests.filter(r => r.status !== "rejected");
+    const h = React.createElement;
+    const icon = (paths) => h("svg", { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" }, paths.map((p, i) => h(p.t || "path", { key: i, ...p })));
+    const menuDefs = [
+      { id: "approvals", label: "Submissions", badge: String(publishedRequests.length), paths: [{ d: "M9 12l2 2 4-4" }, { d: "M21 12c0 5-3.5 8-9 10-5.5-2-9-5-9-10V5l9-3 9 3Z" }] },
+      { id: "users", label: "Users", paths: [{ t: "circle", cx: 9, cy: 8, r: 3.5 }, { d: "M2 21c0-3.5 3-6 7-6s7 2.5 7 6" }] },
+      { id: "centers", label: "Collection centers", paths: [{ d: "M12 21s-7-5-7-11a7 7 0 0 1 14 0c0 6-7 11-7 11Z" }, { t: "circle", cx: 12, cy: 10, r: 2.5 }] },
+      { id: "orgs", label: "Organizations", paths: [{ d: "M3 21V7l9-4 9 4v14M9 21v-6h6v6" }] },
+      { id: "fraud", label: "Fraud & flags", badge: "3", paths: [{ d: "M4 22V4h13l-2.5 5L17 14H4" }] },
+      { id: "analytics", label: "Analytics", paths: [{ d: "M3 3v18h18M7 14l4-4 3 3 5-6" }] }
+    ];
+    const menu = menuDefs.map(m => ({
+      label: m.label, badge: m.badge, hasBadge: !!m.badge,
+      iconEl: icon(m.paths),
+      iconWrap: "display:flex; width:18px; height:18px; align-items:center; justify-content:center;",
+      pick: () => this.setState({ section: m.id }),
+      style: "display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:10px; font-size:13.5px; font-weight:500; cursor:pointer; transition:all .15s; " +
+        (this.state.section === m.id ? "background:#13325a; color:#fff;" : "color:#9fb6d4;")
+    }));
+    const tabs = ["Requests", "Centers", "Organizations"].map(t => ({
+      label: t, pick: () => this.setState({ tab: t }),
+      style: "padding:6px 13px; border-radius:9px; font-family:Inter,sans-serif; font-size:12.5px; font-weight:600; cursor:pointer; border:none; " +
+        (this.state.tab === t ? "background:#0f6b8f; color:#fff;" : "background:#0a1c30; color:#9fb6d4;")
+    }));
+    const centerRows = ((window.VA && window.VA.centers) || []).map((c) => ({
+      id: c.id,
+      initials: VADB.initials(c.name),
+      name: c.name,
+      type: c.source === "submitted" && !c.verified ? "Submitted center" : "Verified center",
+      meta: `${[c.city, c.state, c.country].filter(Boolean).join(", ")} · ${(c.items || []).slice(0, 3).join(", ") || "general supplies"}`,
+      avatarBg: c.source === "submitted" && !c.verified ? "#9a5b18" : "#0f6b8f",
+      flagged: c.source === "submitted" && !c.verified,
+      canVerify: c.source === "submitted" && !c.verified,
+      canDelete: true,
+      canEdit: false,
+      verify: () => {
+        if (!this.state.authed) { this.flash("Log in as admin first. Password: admin123", "#ffb86b"); return; }
+        window.VA_CENTERS.verifyCenter(c.id);
+        this.flash("Center verified on the public site.", "#3ad37f");
+        this.setState({});
+      },
+      delete: () => {
+        if (!this.state.authed) { this.flash("Log in as admin first. Password: admin123", "#ffb86b"); return; }
+        window.VA_CENTERS.hideCenter(c.id);
+        this.flash("Center hidden from the public site.", "#ff8d7e");
+        this.setState({});
+      }
+    }));
+    const dataByTab = {
+      Requests: publishedRequests.map((r, i) => ({
+        id: r.id,
+        initials: VADB.initials(r.name),
+        name: r.name,
+        type: r.category + " request",
+        meta: `${this.supportLabel(r.supportType)} · ${VADB.money(r.requested)} · ${r.method} · ${[r.city, r.state].filter(Boolean).join(", ") || "Venezuela"}`,
+        avatarBg: ["#0f6b8f", "#23885f", "#c74738", "#557c9b", "#9a5b18"][i % 5],
+        flagged: Number(r.requested || 0) > 10000,
+        canDelete: true,
+        canEdit: true,
+        delete: () => {
+          if (!this.state.authed) { this.flash("Log in as admin first. Password: admin123", "#ffb86b"); return; }
+          VADB.updateRequest(r.id, { status: "rejected", reviewedAt: new Date().toISOString() });
+          this.flash("Request hidden from public families.", "#ff8d7e");
+          this.setState({});
+        }
+      })),
+      Centers: centerRows,
+      Organizations: [
+        { id: "o1", initials: "IR", name: "International Rescue Committee", type: "Org verification", meta: "GoFundMe + bank · pending docs · 1d ago", avatarBg: "#557c9b" }
+      ]
+    };
+    const typeChip = "font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:999px; background:#13325a; color:#9fc2f0;";
+    const rows = (dataByTab[this.state.tab] || []).filter(r => !this.state.acted[r.id]).map(r => ({
+      ...r, typeChip,
+      edit: () => this.setState({ editId: r.id }),
+      verify: r.verify || (() => {}),
+      delete: r.delete || (() => {}),
+      canVerify: !!r.canVerify,
+      canDelete: !!r.canDelete,
+      canEdit: r.canEdit !== false
+    }));
+    const allClear = rows.length === 0;
+    const deltaUp = "font-size:11px; font-weight:700; color:#3ad37f; background:#10331f; padding:2px 7px; border-radius:999px;";
+    const deltaDown = "font-size:11px; font-weight:700; color:#ff8d7e; background:#3a1714; padding:2px 7px; border-radius:999px;";
+    return {
+      menu, tabs, rows, allClear,
+      adminLoggedIn: this.state.authed,
+      adminLoggedOut: !this.state.authed,
+      adminLogin: () => {
+        const el = document.querySelector("[data-admin-password]");
+        if (VADB.adminLogin(el && el.value)) this.setState({ authed: true });
+        else this.flash("Wrong password. Demo admin password is admin123.", "#ff8d7e");
+      },
+      adminLoginMain: () => {
+        const el = document.querySelector("[data-admin-password-main]");
+        if (VADB.adminLogin(el && el.value)) this.setState({ authed: true });
+        else this.flash("Wrong password. Demo admin password is admin123.", "#ff8d7e");
+      },
+      adminLogout: () => { VADB.adminLogout(); this.setState({ authed: false }); },
+      exportCsv: () => {
+        const csv = VADB.exportCsv();
+        const blob = new Blob([csv], { type: "text/csv" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "venezuela-ayuda-requests.csv";
+        a.click();
+        URL.revokeObjectURL(a.href);
+        this.flash("CSV exported.", "#3ad37f");
+      },
+      editSelected: !!this.state.editId,
+      noEditSelected: !this.state.editId,
+      edit: db.requests.find(r => r.id === this.state.editId) || {},
+      saveEdit: () => {
+        if (!this.state.authed) { this.flash("Log in as admin first. Password: admin123", "#ffb86b"); return; }
+        if (!this.state.editId) { this.flash("Select a request first.", "#ffb86b"); return; }
+        const data = this.editData();
+        VADB.updateRequest(this.state.editId, {
+          ...data,
+          status: "published",
+          requested: Number(data.requested || 0),
+          raised: Number(data.raised || 0),
+          reviewedAt: new Date().toISOString()
+        });
+        this.flash("Submission updated.", "#3ad37f");
+        this.setState({});
+      },
+      kpis: [
+        { label: "Public submissions", value: String(publishedRequests.length), delta: "live", deltaStyle: deltaUp },
+        { label: "Edited records", value: String(db.requests.filter(r => r.reviewedAt).length), delta: "admin", deltaStyle: deltaUp },
+        { label: "Hidden", value: String(db.requests.filter(r => r.status === "rejected").length), delta: "closed", deltaStyle: deltaDown },
+        { label: "Funds tracked", value: VADB.money(db.requests.reduce((sum, r) => sum + Number(r.raised || 0), 0)), delta: "user data", deltaStyle: deltaUp }
+      ],
+      bars: [
+        { label: "Mon", h: "44%" }, { label: "Tue", h: "62%" }, { label: "Wed", h: "53%" },
+        { label: "Thu", h: "78%" }, { label: "Fri", h: "90%" }, { label: "Sat", h: "70%" }, { label: "Sun", h: "58%" }
+      ],
+      statusBars: [
+        { label: "Published", count: publishedRequests.length, pct: "80%", color: "#0f6b8f" },
+        { label: "Edited by admin", count: db.requests.filter(r => r.reviewedAt).length, pct: "55%", color: "#23885f" },
+        { label: "With tracking", count: publishedRequests.filter(r => Number(r.raised || 0) > 0 || r.receipt || r.trackingNotes).length, pct: "45%", color: "#E0A411" },
+        { label: "Hidden", count: db.requests.filter(r => r.status === "rejected").length, pct: "10%", color: "#c74738" }
+      ],
+      toast: this.state.toast, toastDot: this.state.toastDot
+    };
+  }
+}
+</script>
+</body>
+</html>

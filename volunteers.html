@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./theme.css">
+<script src="./va-lang.js?v=3"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#fff; }
+  @media (max-width:980px){ .va-roles{ grid-template-columns:1fr 1fr !important; } .va-dash2{ grid-template-columns:1fr !important; } }
+  @media (max-width:600px){ .va-roles{ grid-template-columns:1fr !important; } }
+</style>
+</helmet>
+
+<div style="font-family:Inter,system-ui,sans-serif; color:#123044; background:#fff; min-height:100vh;">
+  <dc-import name="Nav" active="volunteers" hint-size="100%,66px"></dc-import>
+
+  <!-- hero -->
+  <section style="position:relative; overflow:hidden; background:radial-gradient(120% 100% at 80% -10%, #0b3f5c, #123044); color:#fff;">
+    <div style="position:absolute; inset:0; background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px); background-size:24px 24px;"></div>
+    <div style="position:relative; max-width:1200px; margin:0 auto; padding:56px 24px 50px; text-align:center;">
+      <div style="font-family:Archivo,sans-serif; font-weight:700; font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:#f2c94c; margin-bottom:12px;">Volunteer</div>
+      <h1 style="font-family:Archivo,sans-serif; font-weight:900; font-size:48px; letter-spacing:-.025em; margin:0 0 16px;">Lend your skills to Venezuela</h1>
+      <p style="font-size:18px; line-height:1.55; color:#c8d6e8; max-width:620px; margin:0 auto 12px;">Tell us how you can help and we'll connect you with the verified organizations where your skills make the biggest difference — from doctors to translators to developers.</p>
+    </div>
+  </section>
+
+  <!-- roles -->
+  <section style="max-width:1200px; margin:0 auto; padding:48px 24px 24px;">
+    <h2 style="font-family:Archivo,sans-serif; font-weight:800; font-size:30px; letter-spacing:-.02em; margin:0 0 8px;">Choose a role</h2>
+    <p style="font-size:16px; color:#536879; margin:0 0 30px;">Select where you can help — you can pick more than one.</p>
+    <div class="va-roles" style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px;">
+      <sc-for list="{{ roles }}" as="r" hint-placeholder-count="7">
+        <div onClick="{{ r.toggle }}" style="{{ r.style }}">
+          <div style="width:46px; height:46px; border-radius:13px; background:{{ r.bg }}; display:flex; align-items:center; justify-content:center; margin-bottom:14px;">{{ r.iconEl }}</div>
+          <h3 style="font-family:Archivo,sans-serif; font-weight:700; font-size:16.5px; color:#123044; margin:0 0 6px;">{{ r.name }}</h3>
+          <p style="font-size:13px; line-height:1.5; color:#536879; margin:0 0 12px;">{{ r.desc }}</p>
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-size:12px; color:#667789;">{{ r.open }} open</span>
+            <span style="{{ r.tickStyle }}">{{ r.tick }}</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- register + dashboard preview -->
+  <section style="max-width:1200px; margin:0 auto; padding:36px 24px 64px;">
+    <div class="va-dash2" style="display:grid; grid-template-columns:1fr 1.3fr; gap:24px; align-items:start;">
+      <!-- registration -->
+      <div style="background:#fff; border:1px solid #edf2f7; border-radius:20px; padding:26px; box-shadow:0 1px 3px rgba(11,42,74,.05);">
+        <h3 style="font-family:Archivo,sans-serif; font-weight:800; font-size:20px; margin:0 0 4px;">Register as a volunteer</h3>
+        <p style="font-size:13.5px; color:#667789; margin:0 0 20px;">{{ selectedLabel }}</p>
+        <label style="font-size:13px; font-weight:600; color:#536879; margin-bottom:6px; display:block;">Full name</label>
+        <input placeholder="Your name" style="width:100%; height:44px; padding:0 13px; border:1.5px solid #dfe7ef; border-radius:11px; font-size:14px; outline:none; margin-bottom:14px;" />
+        <label style="font-size:13px; font-weight:600; color:#536879; margin-bottom:6px; display:block;">Email</label>
+        <input placeholder="you@example.com" style="width:100%; height:44px; padding:0 13px; border:1.5px solid #dfe7ef; border-radius:11px; font-size:14px; outline:none; margin-bottom:14px;" />
+        <label style="font-size:13px; font-weight:600; color:#536879; margin-bottom:6px; display:block;">Country & languages</label>
+        <input placeholder="e.g. Spain · ES, EN" style="width:100%; height:44px; padding:0 13px; border:1.5px solid #dfe7ef; border-radius:11px; font-size:14px; outline:none; margin-bottom:14px;" />
+        <label style="font-size:13px; font-weight:600; color:#536879; margin-bottom:6px; display:block;">Weekly availability</label>
+        <div style="display:flex; gap:7px; margin-bottom:20px;">
+          <sc-for list="{{ avail }}" as="a" hint-placeholder-count="3"><button onClick="{{ a.pick }}" style="{{ a.style }}">{{ a.label }}</button></sc-for>
+        </div>
+        <button style="width:100%; padding:14px; background:#0f6b8f; color:#fff; border:none; border-radius:12px; font-family:Inter,sans-serif; font-size:15px; font-weight:600; cursor:pointer;">Apply to volunteer</button>
+        <p style="font-size:12.5px; color:#667789; text-align:center; line-height:1.5; margin:14px 0 0;">After you apply, our team reviews your profile and connects you with the verified organizations that best match your skills and availability.</p>
+      </div>
+
+      <!-- dashboard preview -->
+      <div style="background:#123044; border-radius:20px; padding:8px; box-shadow:0 20px 50px rgba(11,42,74,.18);">
+        <div style="display:flex; align-items:center; gap:7px; padding:11px 14px;">
+          <span style="width:11px; height:11px; border-radius:50%; background:#ff5f57;"></span><span style="width:11px; height:11px; border-radius:50%; background:#febc2e;"></span><span style="width:11px; height:11px; border-radius:50%; background:#28c840;"></span>
+          <span style="margin-left:8px; font-size:12px; color:#9fb2c9;">Volunteer dashboard</span>
+        </div>
+        <div style="background:#fff; border-radius:14px; padding:22px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
+            <div style="display:flex; align-items:center; gap:11px;">
+              <span style="width:42px; height:42px; border-radius:11px; background:#e8f6ef; color:#23885f; display:flex; align-items:center; justify-content:center; font-family:Archivo,sans-serif; font-weight:800; font-size:15px;">DR</span>
+              <div><div style="font-family:Archivo,sans-serif; font-weight:700; font-size:15.5px;">Dr. Ana Salazar</div><div style="font-size:12px; color:#667789;">Doctor · Case verifier</div></div>
+            </div>
+            <span style="display:flex; align-items:center; gap:4px; font-size:11px; font-weight:700; color:#23885f; background:#e8f6ef; padding:4px 10px; border-radius:999px;">● Active</span>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:18px;">
+            <div style="background:#f5f8fb; border-radius:12px; padding:13px;"><div style="font-family:Archivo,sans-serif; font-weight:800; font-size:22px; color:#123044;">28</div><div style="font-size:11.5px; color:#667789;">Cases verified</div></div>
+            <div style="background:#f5f8fb; border-radius:12px; padding:13px;"><div style="font-family:Archivo,sans-serif; font-weight:800; font-size:22px; color:#123044;">6</div><div style="font-size:11.5px; color:#667789;">In your queue</div></div>
+            <div style="background:#f5f8fb; border-radius:12px; padding:13px;"><div style="font-family:Archivo,sans-serif; font-weight:800; font-size:22px; color:#123044;">94h</div><div style="font-size:11.5px; color:#667789;">Contributed</div></div>
+          </div>
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:#667789; margin-bottom:10px;">Assigned tasks</div>
+          <div style="display:flex; flex-direction:column; gap:9px;">
+            <sc-for list="{{ tasks }}" as="t" hint-placeholder-count="3">
+              <div style="display:flex; align-items:center; gap:11px; padding:11px 13px; border:1px solid #edf2f7; border-radius:11px;">
+                <span style="{{ t.dot }}"></span>
+                <div style="flex:1;"><div style="font-size:13.5px; font-weight:600; color:#123044;">{{ t.title }}</div><div style="font-size:11.5px; color:#667789;">{{ t.meta }}</div></div>
+                <span style="{{ t.chip }}">{{ t.status }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <dc-import name="Footer" hint-size="100%,420px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { picked: ["verifier"], avail: "5–10h" };
+  renderVals() {
+    const h = React.createElement;
+    const icon = (paths, stroke) => h("svg", { width: 23, height: 23, viewBox: "0 0 24 24", fill: "none", stroke, strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" }, paths.map((p, i) => h(p.t || "path", { key: i, ...p })));
+    const defs = [
+      { id: "verifier", name: "Case verifier", desc: "Review documents and confirm family requests.", open: 12, bg: "#e7f5fa", color: "#0f6b8f", paths: [{ d: "M9 12l2 2 4-4" }, { d: "M21 12c0 5-3.5 8-9 10-5.5-2-9-5-9-10V5l9-3 9 3Z" }] },
+      { id: "translator", name: "Translator", desc: "Translate stories and updates EN ⇄ ES.", open: 8, bg: "#fff7e6", color: "#9a5b18", paths: [{ d: "M4 5h7M9 3v2M11 5c0 4-3 7-7 8M5 9c1 2 3 4 5 5" }, { d: "M14 21l4-9 4 9M15.5 17h5" }] },
+      { id: "dev", name: "Web developer", desc: "Build and maintain the platform.", open: 4, bg: "#e8f0ff", color: "#3d4eaa", paths: [{ d: "m8 9-4 3 4 3M16 9l4 3-4 3M13 7l-2 10" }] },
+      { id: "doctor", name: "Doctor", desc: "Advise on medical cases and supplies.", open: 6, bg: "#fdecea", color: "#c74738", paths: [{ d: "M12 8v8M8 12h8" }, { t: "circle", cx: 12, cy: 12, r: 9 }] },
+      { id: "lawyer", name: "Lawyer", desc: "Support legal and compliance questions.", open: 3, bg: "#e7f5fa", color: "#557c9b", paths: [{ d: "M3 7l9-4 9 4M5 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7" }, { d: "M9 12h6" }] },
+      { id: "psych", name: "Psychologist", desc: "Provide emotional support to families.", open: 5, bg: "#e8f6ef", color: "#23885f", paths: [{ d: "M12 21s-7.5-4.6-7.5-10a4.2 4.2 0 0 1 7.5-2.6A4.2 4.2 0 0 1 19.5 11c0 5.4-7.5 10-7.5 10Z" }] },
+      { id: "logistics", name: "Logistics", desc: "Coordinate collection and delivery.", open: 9, bg: "#fdf0e8", color: "#b85c1a", paths: [{ d: "M1 3h13v13H1zM14 8h5l3 3v5h-8" }, { t: "circle", cx: 5.5, cy: 18.5, r: 2 }, { t: "circle", cx: 18.5, cy: 18.5, r: 2 }] }
+    ];
+    const roles = defs.map(d => {
+      const on = this.state.picked.includes(d.id);
+      return {
+        ...d,
+        iconEl: icon(d.paths, d.color),
+        toggle: () => this.setState(s => ({ picked: s.picked.includes(d.id) ? s.picked.filter(x => x !== d.id) : [...s.picked, d.id] })),
+        style: "cursor:pointer; background:#fff; border-radius:18px; padding:22px; box-shadow:0 1px 3px rgba(11,42,74,.05); transition:all .15s; border:1.5px solid " + (on ? "#0f6b8f" : "#edf2f7"),
+        tick: on ? "Selected" : "Select",
+        tickStyle: on
+          ? "font-size:12px; font-weight:700; color:#0f6b8f; display:flex; align-items:center; gap:4px;"
+          : "font-size:12px; font-weight:600; color:#8b9aaa;"
+      };
+    });
+    const sel = this.state.picked.map(id => defs.find(d => d.id === id).name);
+    const selectedLabel = sel.length ? "Applying for: " + sel.join(", ") : "Select one or more roles above to begin.";
+    const avail = ["<5h", "5–10h", "10h+"].map(v => ({
+      label: v, pick: () => this.setState({ avail: v }),
+      style: "flex:1; padding:11px 0; border-radius:10px; font-family:Inter,sans-serif; font-size:13px; font-weight:600; cursor:pointer; transition:all .15s; " +
+        (this.state.avail === v ? "background:#0f6b8f; color:#fff; border:1.5px solid #0f6b8f;" : "background:#fff; color:#536879; border:1.5px solid #dfe7ef;")
+    }));
+    const chip = (c, bg) => `font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:999px; background:${bg}; color:${c}; white-space:nowrap;`;
+    return {
+      roles, selectedLabel, avail,
+      tasks: [
+        { title: "Verify: Rodríguez roof repair", meta: "Housing · Mérida", dot: "width:9px;height:9px;border-radius:50%;background:#E0A411;", chip: chip("#b7791f", "#fff7e6"), status: "In review" },
+        { title: "Confirm GoFundMe link", meta: "Medical · Trujillo", dot: "width:9px;height:9px;border-radius:50%;background:#0f6b8f;", chip: chip("#0f6b8f", "#e7f5fa"), status: "Assigned" },
+        { title: "Translate family update", meta: "EN → ES", dot: "width:9px;height:9px;border-radius:50%;background:#23885f;", chip: chip("#23885f", "#e8f6ef"), status: "Done" }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
